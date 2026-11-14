@@ -64,6 +64,7 @@ const Store = {
     }
     node[keys[keys.length - 1]] = value;
     this.save(d);
+    this.pushSection(section);
     return d;
   },
 
@@ -72,17 +73,106 @@ const Store = {
     return d;
   },
 
-  /* 문의 데이터만 비우고, 매장 설정(response/persona/hours)은 그대로 둔다 */
+  /* ---------- 서버 동기화 ----------
+     로그인한 매장 정보 · 매장 설정 · 문의를 서버에서 받아 이 저장소에 채운다.
+     화면은 계속 Store 만 읽는다. 통화 데모로 직접 넣은 문의(local)는 그대로 둔다. */
+  CH_LABEL: { chat: '채널톡', call: '전화', sns: '인스타그램' },
+
+  applyMe(me) {
+    let d = this.load();
+    /* 다른 매장으로 로그인하면 이전 매장 데이터를 버리고 빈 상태(더미 없이)에서 시작 */
+    if (d.tenantId !== me.tenant.id) d = Object.assign(this.blank(), { tenantId: me.tenant.id });
+    Object.assign(d.settings, {
+      storeName: me.tenant.name,
+      email: me.user.email,
+      onboarded: !!me.setup.done,
+      integrations: me.integrations || {}
+    });
+    return this.save(d);
+  },
+
+  async pullServer() {
+    const [st, inq, sum] = await Promise.all([
+      Api.settings(),
+      Api.inquiries(),
+      Api.dashboardSummary().catch(() => null)
+    ]);
+    const d = this.load();
+    Object.keys(d.store).forEach(sec => {
+      if (st[sec]) d.store[sec] = sec === 'hours' ? this.hoursIn(st.hours) : st[sec];
+    });
+    if (sum) d.serverSummary = sum;
+    const prev = new Map(d.items.map(i => [i.id, i]));
+    const server = inq.items.map((q, i) => {
+      const x = this.fromServer(q, d.settings, inq.items.length - i);
+      const p = prev.get(x.id);    // 화면에서 처리한 표시 · 임시 초안 · 상세 캐시 유지
+      if (!p) return x;
+      const sameVersion = p.updatedAt && p.updatedAt === x.updatedAt;
+      return Object.assign(x, {
+        handled: p.handled || x.handled,
+        reply: p.reply,
+        draft: p.draft,
+        reportedAt: p.reportedAt,
+        detail: sameVersion ? p.detail : null
+      });
+    });
+    d.items = server.concat(d.items.filter(i => i.local));
+    return this.save(d);
+  },
+
+  /* 서버 문의 → 화면용 문의. 점수는 서버 감정 점수, 근거 표현(hits)은 화면 규칙으로 */
+  fromServer(q, st, no) {
+    const text = q.preview || q.title || '';
+    const s = Judge.score(text);
+    const score = q.heat ?? s.value;
+    const needsOwner = q.route === 'B' || q.route === 'C' || q.status === 'pending' || q.status === 'manual';
+    const verdict = needsOwner ? 'held' : Judge.verdict(score, st).key;
+    const handled = q.status === 'done' ? 'sent' : q.status === 'auto_done' ? 'auto' : null;
+    return {
+      id: q.id, no, ts: Date.parse(q.created_at), updatedAt: q.updated_at, text,
+      title: q.title, category: q.category, heatLabel: q.heat_label, route: q.route,
+      channel: this.CH_LABEL[q.channel] || q.channel,
+      customer: Person.key(q.customer_name),
+      score, hits: s.hits, topic: Judge.topic(text),
+      verdict, handled, status: q.status, server: true
+    };
+  },
+
+  /* 영업시간: 서버는 요일마다 구간 배열([{open,close}], 휴무는 []), 화면은 한 구간 {open,close} (휴무는 null) */
+  hoursIn(h) {
+    const weekly = {};
+    Object.entries(h.weekly || {}).forEach(([day, r]) => { weekly[day] = r[0] ? { open: r[0].open, close: r[0].close } : { open: null, close: null }; });
+    return Object.assign({}, h, { weekly });
+  },
+  hoursOut(h) {
+    const weekly = {};
+    Object.entries(h.weekly || {}).forEach(([day, v]) => { weekly[day] = v && v.open && v.close ? [{ open: v.open, close: v.close }] : []; });
+    return Object.assign({}, h, { weekly });
+  },
+
+  /* 매장 설정 한 섹션을 서버에 저장 — 입력이 멈추고 0.6초 뒤 한 번 */
+  _timers: {},
+  pushSection(section) {
+    if (typeof Api === 'undefined' || !Api.token()) return;
+    clearTimeout(this._timers[section]);
+    this._timers[section] = setTimeout(() => {
+      const v = this.load().store[section];
+      Api.patchSettings(section, section === 'hours' ? this.hoursOut(v) : v)
+        .catch(e => window.dispatchEvent(new CustomEvent('mawd:error', { detail: `설정을 저장하지 못했어요: ${e.message}` })));
+    }, 600);
+  },
+
+  /* 문의 데이터만 비우고, 매장 설정(response/persona/hours)과 tenantId는 그대로 둔다 */
   reset() {
     const cur = this.load();
-    return this.save(Object.assign(this.blank(), { settings: cur.settings, store: cur.store }));
+    return this.save(Object.assign(this.blank(), { tenantId: cur.tenantId, settings: cur.settings, store: cur.store }));
   },
 
   /* ---------- 더미 데이터 ----------
      오늘 하루치 문의를 흉내 낸다. 시연에서 입력하면 이 위에 계속 쌓인다. */
   seeded(keepStore) {
     const d = this.blank();
-    if (keepStore) { d.settings = keepStore.settings; d.store = keepStore.store; }
+    if (keepStore) { d.tenantId = keepStore.tenantId; d.settings = keepStore.settings; d.store = keepStore.store; }
     const now = Date.now();
     /* 오래된 것부터 넣어야 번호가 시간순으로 붙는다 */
     for (const [min, who, ch, text] of [...CONFIG.seed].reverse()) {
@@ -119,7 +209,8 @@ const Store = {
       hits: s.hits,
       topic: Judge.topic(text),
       verdict: v.key,
-      handled: null                                 // 'ignored' | 'sent'
+      handled: null,                                // 'ignored' | 'sent'
+      local: true                                   // 이 브라우저에서 직접 넣은 문의 (서버 동기화해도 유지)
     });
     return this.save(d);
   },
@@ -150,7 +241,7 @@ const Store = {
       hits: s.hits,
       topic: Judge.topic(text),
       verdict: v.key,
-      handled: null,
+      handled: null, local: true,
       call: { duration: call.duration || call.sec || null, raw: call.transcript || null }
     });
     return { added: true, data: this.save(d) };
@@ -176,25 +267,45 @@ const Store = {
     return this.save(d);
   },
 
-  /* 플랫폼 연결 — 지금은 mock.
-     서버가 붙으면 이 함수만 POST /api/platforms/:id/connect 로 바꾼다.
-     키는 서버로만 보내고 화면·localStorage 에는 남기지 않는다.
-     돌려주는 모양: { ok, why?, profile?: { storeName, ownerName, bizNo } } */
-  async connectPlatform(id, creds) {
+  /* 플랫폼 연결 — 실제 백엔드 /v1/commerce/connections/:source 연동 */
+  async connectPlatform(id, creds, mode = 'api') {
     const p = CONFIG.platforms.find(x => x.id === id);
-    const c = p && p.connect;
-    if (!c || c.method !== 'api') return { ok: false, why: '자동 연결을 지원하지 않는 플랫폼이에요.' };
-    for (const f of c.fields) {
-      const v = String((creds || {})[f.key] || '').trim();
-      if (!v) return { ok: false, why: `${f.label}을(를) 입력해 주세요.` };
-      if (v.length < f.min) return { ok: false, why: `${f.label} 형식이 올바르지 않아요. 다시 확인해 주세요.` };
+    if (!p) return { ok: false, why: '지원하지 않는 플랫폼이에요.' };
+    const source = p.apiSource || id;
+    const c = p.connect;
+
+    if (mode === 'api') {
+      if (!c || c.method !== 'api') return { ok: false, why: 'API 자동 연결을 지원하지 않는 플랫폼이에요. 데모 모드로 체험해 보세요.' };
+      for (const f of c.fields) {
+        const v = String((creds || {})[f.key] || '').trim();
+        if (!v) return { ok: false, why: `${f.label}을(를) 입력해 주세요.` };
+        if (v.length < f.min) return { ok: false, why: `${f.label} 형식이 올바르지 않아요. 다시 확인해 주세요.` };
+      }
     }
-    await new Promise(r => setTimeout(r, 900));
-    return { ok: true, profile: Object.assign({}, c.mock) };
+
+    if (typeof Api !== 'undefined' && Api.token()) {
+      try {
+        const body = mode === 'demo' ? { mode: 'demo' } : { mode: 'api', credentials: creds };
+        const conn = await Api.upsertCommerceConnection(source, body);
+        if (conn.status === 'error') {
+          return { ok: false, why: conn.last_error || '플랫폼 연결 테스트에 실패했어요.' };
+        }
+        return { ok: true, conn, profile: { storeName: this.load().settings.storeName || '' } };
+      } catch (e) {
+        return { ok: false, why: e.message || '서버 연결에 실패했어요.' };
+      }
+    }
+    return { ok: false, why: '로그인이 필요해요.' };
   },
 
   /* 욕설 표현을 제외한 문의 요약. 원문은 items에 그대로 보관한다. */
   summary(it) {
+    if (it.detail && it.detail.card) {
+      const c = it.detail.card;
+      const demands = (c.demands || []).filter(Boolean).join(', ');
+      return demands ? `${c.title} (${demands})` : c.title;
+    }
+    if (it.server && it.title && it.title !== '(내용 없음)') return it.title;
     const text = String(it.text || '').replace(/\s+/g, ' ').trim();
     const labels = new Set((it.hits || []).map(hit => hit.label));
     const topic = it.topic?.name || '서비스';
@@ -226,11 +337,35 @@ const Store = {
     return this.save(d);
   },
 
-  /* how: 'sent' 이면 reply 에 실제로 전달한 문장을 함께 남긴다 */
-  setHandled(id, how, reply) {
+  /* how: 'sent' | 'ignored' | 'manual' | 'hold' */
+  setHandled(id, how, reply, actionOverride) {
     const d = this.load();
     const it = d.items.find(x => x.id === id);
-    if (it) { it.handled = how; if (how === 'sent') it.reply = reply; }
+    if (it) {
+      if (how !== 'hold') it.handled = how;
+      if (how === 'sent' && reply) it.reply = reply;
+    }
+    if (it && it.server) {
+      const payload = actionOverride || (how === 'sent'
+        ? { type: 'edit_send', text: reply }
+        : how === 'manual' ? { type: 'manual' }
+        : how === 'hold' ? { type: 'hold', memo: reply || '' }
+        : { type: 'close' });
+      Api.inquiryAction(id, payload)
+        .then(detail => {
+          const cur = this.load();
+          const target = cur.items.find(x => x.id === id);
+          if (target) {
+            target.detail = detail;
+            target.status = detail.status;
+            target.updatedAt = detail.updated_at;
+            if (detail.status === 'done') target.handled = how === 'ignored' ? 'ignored' : 'sent';
+            this.save(cur);
+          }
+          window.dispatchEvent(new CustomEvent('mawd:updated'));
+        })
+        .catch(e => window.dispatchEvent(new CustomEvent('mawd:error', { detail: `처리 결과를 서버에 저장하지 못했어요: ${e.message}` })));
+    }
     return this.save(d);
   },
 
@@ -255,14 +390,14 @@ const Store = {
   stats(d) {
     d = d || this.load();
     const held   = d.items.filter(i => i.verdict === 'held' && !i.handled).length;
-    const passed = d.items.filter(i => i.verdict === 'passed').length;
+    const passed = d.items.filter(i => i.verdict === 'passed' || i.handled === 'auto').length;
     const total  = d.items.length;
     const heldAll = d.items.filter(i => i.verdict === 'held').length;
+    const rate = total ? Math.round((total - held) / total * 100) : 0;
     return {
       held, passed, total,
-      shielded: heldAll,
-      /* 방어율 = 사장님이 직접 손대지 않아도 된 비율 */
-      rate: total ? Math.round((total - heldAll) / total * 100) : 0
+      shielded: d.serverSummary ? d.serverSummary.shielded_heated_count : heldAll,
+      rate
     };
   },
 

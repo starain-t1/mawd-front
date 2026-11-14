@@ -17,6 +17,12 @@ const CONFIG = {
     plan: 'STANDARD'
   },
 
+  /* 백엔드 주소 — localhost 에서 열면 http://localhost:8000 을 쓴다 (api.js) */
+  api: { base: 'https://mawd-server.dlfjstizlzl.dev' },
+  /* 업종 → 서버 초기 세팅 템플릿 (GET /v1/onboarding/templates) */
+  templateOf: { food:'food_beverage', cafe:'food_beverage', beauty:'beauty', retail:'online_shop',
+    stay:'other', service:'other', etc:'other' },
+
   /* ---------- 업종 ----------
      어떤 종류의 사업 매장인지 — 설정 화면에서 고르고, 사이드바·현황 상단에 표시된다. */
   bizTypes: [
@@ -48,35 +54,34 @@ const CONFIG = {
     setChannels: 'settings/channels.html',
     tone:        'settings/tone.html',
     store:       'settings/store.html',
-    onboarding:  'onboarding/onboarding.html'
+    onboarding:  'onboarding/onboarding.html',
+    login:       'auth/login.html'
   },
 
   /* ---------- 연동 플랫폼 ----------
      온보딩 첫 단계에서 고른다. kind 로 묶고, 업종 추천에 쓴다. */
   platforms: [
-    { id:'musinsa',     icon:'🖤', name:'무신사',              kind:'fashion',
-      connect:{ method:'paste', note:'공개된 연동 API를 확인하지 못했어요. 문의는 직접 붙여넣어 받아요.' } },
-    { id:'ably',        icon:'👗', name:'에이블리',            kind:'fashion',
-      connect:{ method:'paste', note:'에이블리 파트너스는 API를 지원하지 않아요. 문의는 직접 붙여넣어 받아요.' } },
-    { id:'smartstore',  icon:'🟢', name:'네이버 스마트스토어', kind:'market',
+    { id:'musinsa',     apiSource:'musinsa',     icon:'🖤', name:'무신사',              kind:'fashion',
+      connect:{ method:'paste', note:'공개된 연동 API를 확인하지 못했어요. 판매자센터 CSV 업로드 또는 데모 모드로 연동할 수 있어요.' } },
+    { id:'ably',        apiSource:'ably',        icon:'👗', name:'에이블리',            kind:'fashion',
+      connect:{ method:'paste', note:'에이블리 파트너스는 API를 지원하지 않아요. CSV 업로드 또는 데모 모드로 연동할 수 있어요.' } },
+    { id:'smartstore',  apiSource:'naver',       icon:'🟢', name:'네이버 스마트스토어', kind:'market',
       connect:{ method:'api',
-        help:'스마트스토어센터 → 커머스API에서 발급한 애플리케이션 ID·시크릿을 입력하세요.',
-        fields:[ { key:'appId',     label:'애플리케이션 ID',     min:8 },
-          { key:'appSecret', label:'애플리케이션 시크릿', min:8, secret:true } ],
-        mock:{ storeName:'모루 스토어', ownerName:'김모루' } } },      // 실제로 어디까지 나오는지는 연동 후 확정
-    { id:'coupang',     icon:'📦', name:'쿠팡',                kind:'market',
+        help:'스마트스토어센터 → 커머스API에서 발급한 애플리케이션 ID·시크릿을 입력하거나, 데모 데이터로 바로 체험할 수 있어요.',
+        fields:[ { key:'client_id',     label:'애플리케이션 ID',     min:3 },
+          { key:'client_secret', label:'애플리케이션 시크릿', min:3, secret:true } ] } },
+    { id:'coupang',     apiSource:'coupang',     icon:'📦', name:'쿠팡',                kind:'market',
       connect:{ method:'api',
-        help:'Wing에서 발급한 Access Key·Secret Key와 업체코드예요. 쿠팡은 API 연동업체를 하나만 허용해서, 이미 다른 솔루션을 쓰고 있으면 충돌할 수 있어요.',
-        fields:[ { key:'accessKey', label:'Access Key', min:8 },
-          { key:'secretKey', label:'Secret Key', min:8, secret:true },
-          { key:'vendorId',  label:'업체코드',   min:5 } ],
-        mock:{ storeName:'모루 스토어 쿠팡점' } } },
-    { id:'coupangeats', icon:'🛵', name:'쿠팡이츠',            kind:'delivery',
-      connect:{ method:'paste', note:'공식 연동이 없어요. 아이디·비밀번호는 받지 않고, 문의는 직접 붙여넣어 받아요.' } },
-    { id:'baemin',      icon:'🍔', name:'배달의민족',          kind:'delivery',
-      connect:{ method:'paste', note:'공식 연동이 없어요. 아이디·비밀번호는 받지 않고, 문의는 직접 붙여넣어 받아요.' } },
-    { id:'yogiyo',      icon:'🍽', name:'요기요',              kind:'delivery',
-      connect:{ method:'paste', note:'공식 연동이 없어요. 아이디·비밀번호는 받지 않고, 문의는 직접 붙여넣어 받아요.' } }
+        help:'Wing에서 발급한 Access Key·Secret Key와 업체코드를 입력하거나, 데모 데이터로 바로 체험할 수 있어요.',
+        fields:[ { key:'access_key', label:'Access Key', min:3 },
+          { key:'secret_key', label:'Secret Key', min:3, secret:true },
+          { key:'vendor_id',  label:'업체코드 (Vendor ID)', min:3 } ] } },
+    { id:'coupangeats', apiSource:'coupangeats', icon:'🛵', name:'쿠팡이츠',            kind:'delivery',
+      connect:{ method:'paste', note:'공식 연동이 없어요. 아이디·비밀번호는 받지 않고, CSV 업로드 또는 데모 모드로 연동해요.' } },
+    { id:'baemin',      apiSource:'baemin',      icon:'🍔', name:'배달의민족',          kind:'delivery',
+      connect:{ method:'paste', note:'공식 연동이 없어요. 아이디·비밀번호는 받지 않고, CSV 업로드 또는 데모 모드로 연동해요.' } },
+    { id:'yogiyo',      apiSource:'yogiyo',      icon:'🍽', name:'요기요',              kind:'delivery',
+      connect:{ method:'paste', note:'공식 연동이 없어요. 아이디·비밀번호는 받지 않고, CSV 업로드 또는 데모 모드로 연동해요.' } }
   ],
   /* 연결로 미리 채울 수 있는 사업장 항목 */
   profileFields: [
@@ -224,30 +229,29 @@ const CONFIG = {
      heat 가 격앙도 증가분, ask 가 요약 카드의 "요청" 항목
      ============================================================ */
   scenarios: [
-    { id:'hours', label:'영업시간 문의', heat:0, ask:'영업시간 확인',
+    { id:'hours', label:'영업시간 문의', heat:0, ask:'영업시간 확인', say:'영업시간이 어떻게 돼요?',
       turns:[['cust','거기 몇 시까지 하나요?'],
         ['ai','평일은 10시부터 18시까지 운영해요. 주말은 쉽니다.']] },
 
-    { id:'order', label:'주문 조회', heat:5, ask:'주문 #A-2041 배송 상태 확인',
+    { id:'order', label:'주문 조회', heat:5, ask:'주문 배송 상태 확인', say:'주문한 머그컵 언제 와요?',
       turns:[['cust','어제 주문한 거 어떻게 됐는지 확인 좀 해주세요'],
-        ['ai','주문번호 알려주시면 바로 확인해 드릴게요.'],
-        ['cust','A-2041이요'],
-        ['ai','확인했어요. 오늘 출고 예정이라 내일 도착할 것 같아요.']] },
+        ['ai','주문번호 알려주시면 바로 확인해 드릴게요.']] },
 
-    { id:'verify', label:'본인 확인', heat:0, ask:'주문자 본인 확인',
-      turns:[['cust','제가 주문한 게 맞는지 확인하려고요'],
-        ['ai','주문하신 분 성함과 연락처 뒷자리만 말씀해 주시겠어요?'],
-        ['cust','김민수고요 1234입니다'],
+    { id:'verify', label:'본인 확인', heat:0, ask:'주문자 본인 확인', say:'주문번호 1234 뒷자리 5678이요',
+      turns:[['cust','주문번호 1234 뒷자리 5678이요'],
         ['ai','확인됐습니다. 도와드릴게요.']] },
 
-    { id:'angry', label:'화난 고객', heat:45, ask:'배송 지연 항의 및 환불 요구',
+    { id:'angry', label:'화난 고객', heat:45, ask:'배송 지연 항의 및 환불 요구', say:'아니 진짜 짜증나네요 벌써 며칠째예요 당장 환불해 주세요!!',
       turns:[['cust','아니 이게 말이 됩니까? 배송이 일주일째 안 오는데 도대체 언제 오나요??'],
-        ['ai','많이 기다리셨겠어요. 바로 확인해서 사장님께 전달드릴게요.'],
-        ['cust','당장 환불해 주세요. 안 그러면 리뷰 다 깎아버릴 겁니다']] },
+        ['ai','많이 기다리셨겠어요. 바로 확인해서 사장님께 전달드릴게요.']] },
 
-    { id:'legal', label:'법적 조치 언급', heat:40, ask:'법적 조치 언급 — 기록 보존 필요',
+    { id:'legal', label:'법적 조치 언급', heat:40, ask:'법적 조치 언급 — 기록 보존 필요', say:'소비자원에 신고하겠습니다. 변호사랑 얘기 중이니 각오하세요',
       turns:[['cust','소비자원에 신고하겠습니다. 변호사랑 얘기 중이니 각오하세요'],
-        ['ai','말씀 주신 내용은 그대로 기록해서 담당자에게 전달드릴게요.']] }
+        ['ai','말씀 주신 내용은 그대로 기록해서 담당자에게 전달드릴게요.']] },
+
+    { id:'close', label:'통화 마무리', heat:0, ask:'대화 종료', say:'네 알겠어요 끊을게요',
+      turns:[['cust','네 알겠어요 끊을게요'],
+        ['ai','문의해 주셔서 감사합니다.']] }
   ],
 
   /* 통화 요약 카드의 추천 대응 — 쓰인 시나리오에 따라 고른다 */
@@ -267,11 +271,12 @@ const CONFIG = {
 
   /* 채널톡 채팅 탭의 예시 문장 */
   samples: [
-    ['정상 문의', '안녕하세요, 어제 주문한 제품 배송 조회가 안 되는데 확인 부탁드립니다.'],
-    ['불만 고조', '환불 아직도 안 됐는데 도대체 언제 해주나요?? 몇 번째 묻는지 모르겠네요'],
+    ['영업시간',  '영업시간이 어떻게 되나요?'],
+    ['주문 조회', '주문한 머그컵 언제 와요?'],
+    ['본인 확인', '주문번호 1234 / 010-1111-5678 입니다'],
+    ['불만 고조', '아 진짜 짜증나네 일주일째 안 오는데 당장 환불해줘요!!'],
     ['법적 조치', '소비자원에 신고하겠습니다. 변호사랑 얘기 중이니 각오하세요.'],
     ['욕설·비방', '진짜 최악이다 ㅋㅋ 다신 안 삼 여기 사람들 주의하세요 사기임'],
-    ['협박',      '당장 전화받아라 아니면 가만 안 둔다 리뷰 다 깎아버릴거야'],
     ['칭찬',      '제품 너무 이뻐요 ㅠㅠ 잘 받았습니다 재구매 의사 100%']
   ],
 
@@ -322,12 +327,20 @@ const CONFIG = {
         note:'AI 이름, 존댓말 수준, 답변 길이, 금지 표현' },
       { id:'hours', api:'hours', icon:'🕐', label:'영업시간', ready:true, live:true,
         note:'AI는 24시간 응대하고, 영업시간은 사장님 연락 예정 시각 안내에만 쓰여요' },
-      { id:'masking', api:'masking', icon:'🙊', label:'욕설 처리', ready:false },
-      { id:'notifications', api:'notifications', icon:'🔔', label:'알림', ready:false },
-      { id:'voice', api:'voice', icon:'📞', label:'전화', ready:false },
-      { id:'ai', api:'ai', icon:'🤖', label:'AI 모델', ready:false },
-      { id:'data-access', api:'data-access', icon:'📦', label:'주문 조회', ready:false },
-      { id:'issues', api:'issues', icon:'♻️', label:'반복 이슈', ready:false }
+      { id:'voice', api:'voice', icon:'📞', label:'전화 응대', ready:true, live:true,
+        note:'음성 엔진(Vapi/OpenAI/브라우저), 말 속도, 끼어들기, 폭언 경고 횟수' },
+      { id:'ai', api:'ai', icon:'🤖', label:'AI 모델', ready:true, live:true,
+        note:'Liner 라우터 모델, 판단 엔진(Bivia/LLM), RAG 검색 설정' },
+      { id:'data-access', api:'data-access', icon:'📦', label:'주문 조회', ready:true, live:true,
+        note:'본인 확인 규칙, 택배사 실시간 배송 조회 허용 여부' },
+      { id:'instagram', api:'instagram', icon:'📷', label:'인스타 댓글', ready:true, live:true,
+        note:'연결된 인스타 계정의 악성 댓글 자동 숨김 · 일반 문의 공개 답글 설정' },
+      { id:'notifications', api:'notifications', icon:'🔔', label:'알림', ready:true, live:true,
+        note:'우선순위 기준, 조용한 시간, 푸시 알림 설정' },
+      { id:'issues', api:'issues', icon:'♻️', label:'반복 이슈', ready:true, live:true,
+        note:'동일 주제 반복 감지 건수 · 집계 기간' },
+      { id:'knowledge', api:'context-docs / faqs', icon:'📚', label:'매장 지식 · FAQ', ready:true, live:true,
+        note:'AI가 답변 근거로 참조하는 매장 소개 · 상품 · 운영 정책 · FAQ' }
     ],
 
     defaults: {
@@ -361,6 +374,44 @@ const CONFIG = {
           sat: { open:null, close:null }, sun: { open:null, close:null }
         },
         holidays: []
+      },
+      voice: {
+        enabled: true,
+        tts: { engine: 'vapi', voice_name: 'coral', rate: 1.15, pitch: 1, instructions: '차분하고 따뜻하게' },
+        silence_ms: 1200,
+        barge_in: true,
+        abuse_turn_limit: 3,
+        max_call_minutes: 10,
+        recording_notice: true
+      },
+      ai: {
+        model: 'liner-gpt-router',
+        judge: 'bivia',
+        monthly_budget_usd: null
+      },
+      'data-access': {
+        enabled: true,
+        tools: { lookup_order: true, find_orders: true, customer_history: true, track_shipment: true },
+        max_verify_attempts: 3,
+        max_lookups_per_inquiry: 10
+      },
+      instagram: {
+        enabled: true,
+        auto_hide: 'abusive',
+        hide_heat_gte: 80,
+        auto_reply: true
+      },
+      notifications: {
+        min_heat_to_notify: 0,
+        quiet_hours: { enabled: false, start: '22:00', end: '08:00' },
+        priority: { urgent_heat_gte: 70, high_heat_gte: 40, risk_flag_is_urgent: true, handoff_is_high: true },
+        push: { enabled: true }
+      },
+      issues: {
+        enabled: true,
+        min_inquiries: 3,
+        window_hours: 24,
+        default_recipients: 'involved'
       }
     },
 
@@ -385,13 +436,13 @@ const CONFIG = {
           desc:'판단 확신이 이보다 낮으면 보류(C)' },
         { path:'require_grounding', type:'toggle',
           desc:'정책 문서 · 데이터 근거가 없으면 자동 답변 금지' },
-        { path:'max_ai_replies_per_inquiry', type:'number', min:1, max:20, unit:'회',
+        { path:'max_ai_replies_per_inquiry', type:'number', min:1, max:50, unit:'회',
           desc:'한 문의에서 AI가 보낼 수 있는 최대 메시지 수' },
-        { path:'owner_reply_sla_minutes', type:'number', min:5, max:1440, unit:'분',
+        { path:'owner_reply_sla_minutes', type:'number', min:5, max:4320, unit:'분',
           desc:'고객에게 안내할 사장님 답변 예정 시간 ({sla} 변수)' },
-        { path:'chat_idle_minutes', type:'number', min:1, max:120, unit:'분',
+        { path:'chat_idle_minutes', type:'number', min:1, max:1440, unit:'분',
           desc:'채팅에서 고객이 이만큼 말이 없으면 대화를 마무리하고 요약 카드 생성' },
-        { path:'debounce_seconds', type:'number', min:0, max:60, unit:'초',
+        { path:'debounce_seconds', type:'number', min:1, max:30, unit:'초',
           desc:'연속 메시지를 묶어 분석하는 대기 시간' },
         { path:'ai_disclosure', type:'group', desc:'첫 응답의 AI 고지 문구',
           children:[
@@ -418,6 +469,94 @@ const CONFIG = {
         { path:'weekly', type:'weekly', desc:'요일별 여는 시간 · 닫는 시간 (AI 응대와 무관, 안내용)' },
         { path:'holidays', type:'textarea', lines:true,
           desc:'휴무일 — YYYY-MM-DD, 한 줄에 하나', placeholder:'2026-12-25' }
+      ],
+      voice: [
+        { path:'enabled', type:'toggle', desc:'AI 전화 응대 활성화' },
+        { path:'tts.engine', type:'select', desc:'음성 합성/통화 엔진',
+          options:[
+            { value:'vapi', label:'Vapi (실시간 통화)' },
+            { value:'openai', label:'서버 TTS + 브라우저 인식' },
+            { value:'browser', label:'브라우저 내장 음성' }
+          ] },
+        { path:'tts.voice_name', type:'select', desc:'OpenAI/서버 TTS 목소리',
+          options:[
+            { value:'coral', label:'coral (따뜻함)' }, { value:'nova', label:'nova' },
+            { value:'alloy', label:'alloy' }, { value:'ash', label:'ash' },
+            { value:'sage', label:'sage' }, { value:'shimmer', label:'shimmer' },
+            { value:'echo', label:'echo' }, { value:'onyx', label:'onyx' }
+          ] },
+        { path:'tts.rate', type:'number', min:0.5, max:2, step:0.05, desc:'말 속도 (0.5 ~ 2.0)' },
+        { path:'tts.instructions', type:'text', desc:'말투 지시 (예: 차분하고 따뜻하게)' },
+        { path:'barge_in', type:'toggle', desc:'AI가 말하는 중 고객이 말하면 즉시 멈춤' },
+        { path:'recording_notice', type:'toggle', desc:'통화 시작 시 AI 응대 · 녹음 고지' },
+        { path:'silence_ms', type:'number', min:300, max:3000, step:100, unit:'ms', desc:'발화 종료 대기 시간' },
+        { path:'abuse_turn_limit', type:'number', min:1, max:10, unit:'회', desc:'연속 욕설 시 경고 후 종료 횟수' },
+        { path:'max_call_minutes', type:'number', min:1, max:60, unit:'분', desc:'최대 통화 시간' }
+      ],
+      ai: [
+        { path:'model', type:'select', desc:'Liner API 라우터 모델',
+          options:[
+            { value:'liner-gpt-router', label:'GPT (liner-gpt-router)' },
+            { value:'liner-claude-router', label:'Claude (liner-claude-router)' },
+            { value:'liner-gemini-router', label:'Gemini (liner-gemini-router)' }
+          ] },
+        { path:'judge', type:'select', desc:'고객 발화 감정·위험 판단 엔진',
+          options:[
+            { value:'bivia', label:'Bivia (실패 시 LLM)' },
+            { value:'llm', label:'LLM 직접 판단' },
+            { value:'liner_decisions', label:'Liner Decisions' }
+          ] },
+        { path:'monthly_budget_usd', type:'number', min:0, step:1, unit:'USD', desc:'월 AI 비용 상한 (비우면 무제한)' }
+      ],
+      'data-access': [
+        { path:'enabled', type:'toggle', desc:'AI 주문 데이터 조회 허용' },
+        { path:'tools', type:'group', desc:'AI가 쓸 수 있는 조회 도구',
+          children:[
+            { key:'lookup_order', type:'toggle' },
+            { key:'find_orders', type:'toggle' },
+            { key:'customer_history', type:'toggle' },
+            { key:'track_shipment', type:'toggle' }
+          ] },
+        { path:'max_verify_attempts', type:'number', min:1, max:5, unit:'회', desc:'본인 확인 실패 허용 횟수' },
+        { path:'max_lookups_per_inquiry', type:'number', min:1, max:30, unit:'회', desc:'문의당 최대 조회 횟수' }
+      ],
+      instagram: [
+        { path:'enabled', type:'toggle', desc:'연결된 인스타 계정의 댓글을 AI가 처리' },
+        { path:'auto_hide', type:'select', desc:'악성/격앙 댓글 자동 숨김 기준',
+          options:[
+            { value:'abusive', label:'욕설·비하만 자동 숨김' },
+            { value:'abusive_or_heated', label:'욕설 또는 격앙 점수 초과 시 숨김' },
+            { value:'off', label:'자동 숨김 안 함' }
+          ] },
+        { path:'hide_heat_gte', type:'number', min:0, max:100, unit:'점', desc:'격앙 숨김 점수 기준' },
+        { path:'auto_reply', type:'toggle', desc:'일반 문의 댓글에 AI 공개 답글' }
+      ],
+      notifications: [
+        { path:'min_heat_to_notify', type:'number', min:0, max:100, unit:'점', desc:'이 점수 이상일 때만 알림 생성' },
+        { path:'quiet_hours', type:'group', desc:'조용한 시간 (긴급 제외 무음/배지 처리)',
+          children:[
+            { key:'enabled', type:'toggle' },
+            { key:'start', type:'text' },
+            { key:'end', type:'text' }
+          ] },
+        { path:'priority', type:'group', desc:'감정 점수 → 우선순위 기준',
+          children:[
+            { key:'urgent_heat_gte', type:'number', min:0, max:100 },
+            { key:'high_heat_gte', type:'number', min:0, max:100 },
+            { key:'risk_flag_is_urgent', type:'toggle' },
+            { key:'handoff_is_high', type:'toggle' }
+          ] },
+        { path:'push.enabled', type:'toggle', desc:'모바일/브라우저 FCM 푸시 알림' }
+      ],
+      issues: [
+        { path:'enabled', type:'toggle', desc:'반복 이슈 자동 감지' },
+        { path:'min_inquiries', type:'number', min:2, max:50, unit:'건', desc:'이 건수 이상 유사 문의 시 이슈 제안' },
+        { path:'window_hours', type:'number', min:1, max:168, unit:'시간', desc:'집계 기간' },
+        { path:'default_recipients', type:'select', desc:'공지 메일 기본 수신 대상',
+          options:[
+            { value:'involved', label:'문의한 고객만' },
+            { value:'involved_and_list', label:'문의 고객 + 전체 구독자' }
+          ] }
       ]
     }
   }
