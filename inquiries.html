@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>문의 — 감정방패</title>
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="inquiries" data-root="">
+
+<div class="app">
+
+  <!-- 사이드바 — 768px 이상 -->
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">🛡</div>
+      <div class="brand-text">
+        <div class="bt1">감정방패</div>
+        <div class="bt2">야근금지연구소</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="nav-item" href="index.html"><span class="nav-ico">📊</span><span class="nav-label">현황</span></a>
+      <a class="nav-item is-active" href="inquiries.html"><span class="nav-ico">📋</span><span class="nav-label">문의</span><span class="nav-count" style="display:none">0</span></a>
+      <a class="nav-item" href="channels.html"><span class="nav-ico">💬</span><span class="nav-label">채널</span></a>
+      <a class="nav-item" href="customer/list.html"><span class="nav-ico">👤</span><span class="nav-label">고객</span></a>
+      <a class="nav-item" href="settings/main.html"><span class="nav-ico">⚙️</span><span class="nav-label">설정</span></a>
+      <a class="nav-item" href="demo.html"><span class="nav-ico">📞</span><span class="nav-label">통화</span></a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="side-card">
+        <div class="sc1">더미 데이터 적용 중</div>
+        <div class="sc2">고객 통화 화면에서 전화를 걸면 모든 화면에 함께 반영됩니다.</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-t"><h1 id="pageTitle">문의</h1><p id="pageSub">승인 대기와 차단 내역</p></div>
+      <a class="icon-btn" href="inquiries.html" aria-label="알림">🔔<span class="pip" style="display:none"></span></a>
+    </header>
+
+    <!-- 내용은 app.js 가 Store 를 읽어 그린다 -->
+    <div class="view" id="page"></div>
+  </div>
+</div>
+
+<!-- 하단 탭바 — 768px 미만 -->
+<nav id="tabbar" class="tabbar" aria-label="하단 탭">
+  <a class="tab" href="index.html"><span class="tab-ico">📊</span>현황</a>
+  <a class="tab is-active" href="inquiries.html"><span class="pip" style="display:none"></span><span class="tab-ico">📋</span>문의</a>
+  <a class="tab" href="channels.html"><span class="tab-ico">💬</span>채널</a>
+  <a class="tab" href="customer/list.html"><span class="tab-ico">👤</span>고객</a>
+  <a class="tab" href="settings/main.html"><span class="tab-ico">⚙️</span>설정</a>
+  <a class="tab" href="demo.html"><span class="tab-ico">📞</span>통화</a>
+</nav>
+
+<script src="config.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

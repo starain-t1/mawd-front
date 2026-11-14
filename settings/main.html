@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>설정 — 감정방패</title>
+  <meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body data-page="settings" data-root="../">
+
+<div class="app">
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">🛡</div>
+      <div class="brand-text">
+        <div class="bt1">감정방패</div>
+        <div class="bt2">야근금지연구소</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="nav-item" href="../index.html"><span class="nav-ico">📊</span><span class="nav-label">현황</span></a>
+      <a class="nav-item" href="../inquiries.html"><span class="nav-ico">📋</span><span class="nav-label">문의</span><span class="nav-count" style="display:none">0</span></a>
+      <a class="nav-item" href="../channels.html"><span class="nav-ico">💬</span><span class="nav-label">채널</span></a>
+      <a class="nav-item" href="../customer/list.html"><span class="nav-ico">👤</span><span class="nav-label">고객</span></a>
+      <a class="nav-item is-active" href="../settings/main.html"><span class="nav-ico">⚙️</span><span class="nav-label">설정</span></a>
+      <a class="nav-item" href="../demo.html"><span class="nav-ico">📞</span><span class="nav-label">통화</span></a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="side-card">
+        <div class="sc1">설정</div>
+        <div class="sc2">판정 기준을 바꾸면 쌓인 문의가 다시 판정됩니다.</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-t">
+        <h1 id="pageTitle">설정</h1>
+        <p id="pageSub">방패 동작 방식을 관리합니다</p>
+      </div>
+    </header>
+
+    <div class="view">
+      <div class="sec">
+        <div class="card" style="display:flex;align-items:center;gap:12px;background:var(--soft-2)">
+          <div class="avatar" style="width:44px;height:44px;border-radius:11px;font-size:16px">모</div>
+          <div style="flex:1;min-width:0">
+            <div id="shopNamePreview" style="font-size:14.5px;font-weight:700">야근금지연구소</div>
+            <div class="row-t2">owner@moru.kr</div>
+          </div>
+          <span class="chip solid">STANDARD</span>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="eyebrow">매장 정보와 응대 정책</div>
+
+        <form id="storeSettingsForm" class="card">
+          <div class="field">
+            <label class="label" for="shopName">매장명</label>
+            <input class="input" id="shopName" name="shopName" placeholder="매장명을 입력하세요">
+          </div>
+
+          <div class="field">
+            <label class="label" for="shopType">업종</label>
+            <input class="input" id="shopType" name="shopType" placeholder="예: 온라인 의류 판매">
+          </div>
+
+          <div class="field">
+            <label class="label" for="businessHours">영업시간</label>
+            <input class="input" id="businessHours" name="businessHours" placeholder="예: 평일 10:00–18:00">
+          </div>
+
+          <div class="field">
+            <label class="label" for="shippingPolicy">배송·교환 정책</label>
+            <textarea class="textarea" id="shippingPolicy" name="shippingPolicy"
+                      placeholder="배송 및 교환 기준을 입력하세요"></textarea>
+          </div>
+
+          <div class="field">
+            <label class="label" for="refundPolicy">환불 정책</label>
+            <textarea class="textarea" id="refundPolicy" name="refundPolicy"
+                      placeholder="환불 가능 조건과 절차를 입력하세요"></textarea>
+          </div>
+
+          <div class="field">
+            <label class="label" for="compensationLimit">보상 한도</label>
+            <input class="input" id="compensationLimit" name="compensationLimit"
+                   placeholder="예: 최대 10,000원, 초과 시 승인 필요">
+            <div class="hint">입력한 한도는 매장 정책 정보로 저장됩니다.</div>
+          </div>
+
+          <button class="btn block" type="submit">매장 설정 저장</button>
+          <div id="storeSettingsSaved" class="hint" role="status" hidden>저장했습니다.</div>
+        </form>
+      </div>
+
+      <div class="sec">
+        <div class="eyebrow">방패 설정</div>
+        <div class="list">
+          <a class="row" href="channels.html">
+            <span class="ico-box">💬</span>
+            <span class="row-body">
+              <span class="row-t1">채널 연결</span>
+              <span class="row-t2">채널톡 허브로 수집</span>
+            </span>
+            <span class="chev">›</span>
+          </a>
+
+          <a class="row" href="threshold.html">
+            <span class="ico-box">🎚</span>
+            <span class="row-body">
+              <span class="row-t1">판정 기준</span>
+              <span class="row-t2" id="thSummary">—</span>
+            </span>
+            <span class="chev">›</span>
+          </a>
+
+          <a class="row" href="tone.html">
+            <span class="ico-box">🗣</span>
+            <span class="row-body">
+              <span class="row-t1">접수 확인 문구</span>
+              <span class="row-t2">손님에게 나가는 유일한 자동 메시지</span>
+            </span>
+            <span class="chev">›</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="eyebrow">알림</div>
+        <div class="list">
+          <div class="row">
+            <span class="ico-box">🔔</span>
+            <span class="row-body">
+              <span class="row-t1">긴급 카드 즉시 알림</span>
+              <span class="row-t2">차단·위협 표현 감지 시</span>
+            </span>
+            <input class="sw" type="checkbox" id="sw-push" checked>
+            <label class="sw-ui" for="sw-push" aria-label="긴급 알림"></label>
+          </div>
+
+          <div class="row">
+            <span class="ico-box">📬</span>
+            <span class="row-body">
+              <span class="row-t1">하루 요약</span>
+              <span class="row-t2">나머지는 묶어서 1회</span>
+            </span>
+            <input class="sw" type="checkbox" id="sw-daily" checked>
+            <label class="sw-ui" for="sw-daily" aria-label="하루 요약"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="eyebrow">AI 전화 데모 연동</div>
+        <div class="card">
+          <label class="label" for="apiUrl">데모 서버 주소</label>
+          <input class="input" id="apiUrl" placeholder="https://example.trycloudflare.com">
+          <div class="hint">
+            통화를 가져올 서버 주소입니다. 터널을 다시 켜면 주소가 바뀌니 여기서 고치세요.
+            고객 화면의 <b>통화 가져오기</b> 버튼이 이 주소를 씁니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="eyebrow">데이터</div>
+        <div class="btn-row">
+          <button class="btn ghost" id="reseed">더미 데이터 다시 채우기</button>
+          <button class="btn ghost" id="reset" style="color:var(--red)">전체 비우기</button>
+        </div>
+        <div class="hint" style="text-align:center">
+          <b>더미 데이터</b>는 오늘 하루치 문의 18건입니다.
+          <b>전체 비우기</b>를 누르면 0에서 시작합니다.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav id="tabbar" class="tabbar" aria-label="하단 탭">
+  <a class="tab" href="../index.html"><span class="tab-ico">📊</span>현황</a>
+  <a class="tab" href="../inquiries.html"><span class="pip" style="display:none"></span><span class="tab-ico">📋</span>문의</a>
+  <a class="tab" href="../channels.html"><span class="tab-ico">💬</span>채널</a>
+  <a class="tab" href="../customer/list.html"><span class="tab-ico">👤</span>고객</a>
+  <a class="tab is-active" href="../settings/main.html"><span class="tab-ico">⚙️</span>설정</a>
+  <a class="tab" href="../demo.html"><span class="tab-ico">📞</span>통화</a>
+</nav>
+
+<script src="../config.js"></script>
+<script src="../store.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>

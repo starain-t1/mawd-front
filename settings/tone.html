@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>접수 확인 문구 — 감정방패</title>
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body data-page="settings" data-root="../">
+
+<div class="app">
+  <aside id="sidebar" class="sidebar">>
+    <div class="brand">
+      <div class="brand-mark">🛡</div>
+      <div class="brand-text"><div class="bt1">감정방패</div><div class="bt2">야근금지연구소</div></div>
+    </div>
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="nav-item" href="../index.html"><span class="nav-ico">📊</span><span class="nav-label">현황</span></a>
+      <a class="nav-item" href="../inquiries.html"><span class="nav-ico">📋</span><span class="nav-label">문의</span><span class="nav-count" style="display:none">0</span></a>
+      <a class="nav-item" href="../channels.html"><span class="nav-ico">💬</span><span class="nav-label">채널</span></a>
+      <a class="nav-item" href="../customer/list.html"><span class="nav-ico">👤</span><span class="nav-label">고객</span></a>
+      <a class="nav-item is-active" href="../settings/main.html"><span class="nav-ico">⚙️</span><span class="nav-label">설정</span></a>
+      <a class="nav-item" href="../demo.html"><span class="nav-ico">📞</span><span class="nav-label">통화</span></a>
+    </nav>
+    <div class="side-foot"><div class="side-card">
+      <div class="sc1">설정</div>
+      <div class="sc2">판정 기준을 바꾸면 쌓인 문의가 다시 판정됩니다.</div>
+    </div></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <a class="back" href="main.html">‹</a>
+      <div class="topbar-t"><h1 id="pageTitle">접수 확인 문구</h1><p id="pageSub"></p></div>
+    </header>
+    <div class="view">
+      <div class="sec"><div class="note">
+        손님에게 나가는 자동 메시지는 <b>접수 확인 하나뿐</b>입니다.
+        AI가 손님과 대화하거나 달래지 않습니다. 실제 답은 담당자가 승인한 것만 나갑니다.
+      </div></div>
+
+      <div class="sec">
+        <div class="eyebrow">접수 확인 문구</div>
+        <div class="card">
+          <div class="msg ai" style="margin-bottom:0">
+            <div class="msg-av">🛡</div>
+            <div class="bubble" style="max-width:100%">
+              문의가 접수되었습니다. 담당자에게 전달했으며 <b>영업일 1일 이내</b> 답변드리겠습니다.
+            </div>
+          </div>
+          <div class="row-t2" style="margin-top:10px">
+            사과 · 전달 사실 · 응답 약속 시간만 담습니다. 공감하는 척하거나 약속을 더하지 않습니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="eyebrow">응답 약속 시간</div>
+        <div class="list">
+          <div class="row"><span class="row-body"><span class="row-t1">영업일 1일 이내</span></span>
+            <span class="chip solid">선택됨</span></div>
+          <div class="row"><span class="row-body"><span class="row-t1">영업일 3일 이내</span></span>
+            <span class="chev">›</span></div>
+          <div class="row"><span class="row-body"><span class="row-t1">당일 안내</span></span>
+            <span class="chev">›</span></div>
+        </div>
+      </div>
+
+      <div class="sec"><div class="note">
+        약속한 시간이 다가오면 담당자에게 알리고, 넘기면 손님에게 중간 안내가 나갑니다.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<nav id="tabbar" class="tabbar" aria-label="하단 탭">
+  <a class="tab" href="../index.html"><span class="tab-ico">📊</span>현황</a>
+  <a class="tab" href="../inquiries.html"><span class="pip" style="display:none"></span><span class="tab-ico">📋</span>문의</a>
+  <a class="tab" href="../channels.html"><span class="tab-ico">💬</span>채널</a>
+  <a class="tab" href="../customer/list.html"><span class="tab-ico">👤</span>고객</a>
+  <a class="tab is-active" href="../settings/main.html"><span class="tab-ico">⚙️</span>설정</a>
+  <a class="tab" href="../demo.html"><span class="tab-ico">📞</span>통화</a>
+</nav>
+
+<script src="../config.js"></script>
+<script src="../store.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>

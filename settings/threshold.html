@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>판정 기준 — 감정방패</title>
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body data-page="settings" data-root="../">
+
+<div class="app">
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">🛡</div>
+      <div class="brand-text"><div class="bt1">감정방패</div><div class="bt2">야근금지연구소</div></div>
+    </div>
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="nav-item" href="../index.html"><span class="nav-ico">📊</span><span class="nav-label">현황</span></a>
+      <a class="nav-item" href="../inquiries.html"><span class="nav-ico">📋</span><span class="nav-label">문의</span><span class="nav-count" style="display:none">0</span></a>
+      <a class="nav-item" href="../channels.html"><span class="nav-ico">💬</span><span class="nav-label">채널</span></a>
+      <a class="nav-item" href="../customer/list.html"><span class="nav-ico">👤</span><span class="nav-label">고객</span></a>
+      <a class="nav-item is-active" href="../settings/main.html"><span class="nav-ico">⚙️</span><span class="nav-label">설정</span></a>
+      <a class="nav-item" href="../demo.html"><span class="nav-ico">📞</span><span class="nav-label">통화</span></a>
+    </nav>
+    <div class="side-foot"><div class="side-card">
+      <div class="sc1">설정</div>
+      <div class="sc2">판정 기준을 바꾸면 쌓인 문의가 다시 판정됩니다.</div>
+    </div></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <a class="back" href="main.html">‹</a>
+      <div class="topbar-t"><h1 id="pageTitle">판정 기준</h1><p id="pageSub"></p></div>
+    </header>
+    <div class="view">
+      <div class="sec">
+        <div class="note">문의마다 매겨지는 <b>악성 점수(0–100)</b>로 어디서 차단하고 어디서 보류할지 정합니다.
+        바꾸면 <b>이미 쌓인 문의도 즉시 다시 판정</b>됩니다.</div>
+      </div>
+
+      <div class="sec"><div class="card">
+        <div class="th-row">
+          <div class="th-label">차단 기준 <b id="vBlock">60</b>점</div>
+          <input class="range red" type="range" id="thBlock" min="0" max="100" value="60">
+          <div class="ticks"><span>0 엄격</span><span>50</span><span>100 느슨</span></div>
+        </div>
+        <div class="row-t2">이 점수 이상이면 담당자 화면에서 가려집니다. 기록은 남습니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="th-row">
+          <div class="th-label">보류 기준 <b id="vHold">35</b>점</div>
+          <input class="range gold" type="range" id="thHold" min="0" max="100" value="35">
+          <div class="ticks"><span>0</span><span>50</span><span>100</span></div>
+        </div>
+        <div class="row-t2">이 점수 이상이면 자동 발송을 멈추고 승인 대기함으로 넘깁니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="th-row">
+          <div class="th-label">반복 이슈 기준 <b id="vRepeat">5</b>건</div>
+          <input class="range blue" type="range" id="thRepeat" min="2" max="20" value="5">
+          <div class="ticks"><span>2건</span><span>10건</span><span>20건</span></div>
+        </div>
+        <div class="row-t2">같은 주제 문의가 이 건수를 넘으면 묶어서 알립니다.</div>
+      </div></div>
+
+      <div class="sec"><div class="note">
+        두 점수 중 <b>높은 쪽이 차단</b>, 낮은 쪽이 보류 기준입니다.
+        현재 설정: <b id="thSummary">—</b>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<nav id="tabbar" class="tabbar" aria-label="하단 탭">
+  <a class="tab" href="../index.html"><span class="tab-ico">📊</span>현황</a>
+  <a class="tab" href="../inquiries.html"><span class="pip" style="display:none"></span><span class="tab-ico">📋</span>문의</a>
+  <a class="tab" href="../channels.html"><span class="tab-ico">💬</span>채널</a>
+  <a class="tab" href="../customer/list.html"><span class="tab-ico">👤</span>고객</a>
+  <a class="tab is-active" href="../settings/main.html"><span class="tab-ico">⚙️</span>설정</a>
+  <a class="tab" href="../demo.html"><span class="tab-ico">📞</span>통화</a>
+</nav>
+
+<script src="../config.js"></script>
+<script src="../store.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>

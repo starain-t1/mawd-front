@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>매장 설정 · 감정방패</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body data-page="store" data-root="../">
+<div class="app">
+  <!-- 사이드바 — 768px 이상 -->
+  <aside class="sidebar" id="sidebar" aria-label="사이드바"></aside>
+
+  <!-- 본문 -->
+  <div class="main">
+    <header class="topbar">
+      <a class="back" href="main.html" aria-label="설정으로 돌아가기">‹</a>
+      <div class="topbar-t">
+        <h1 id="pageTitle">매장 설정</h1>
+        <p id="pageSub">응대 정책 · 말투 · 영업시간</p>
+      </div>
+      <a class="icon-btn" href="../inquiries.html" aria-label="승인 대기 문의">
+        🔔<span class="pip" style="display:none"></span>
+      </a>
+    </header>
+
+    <main class="view" id="page"></main>
+  </div>
+</div>
+
+<!-- 하단 탭바 — 768px 미만 -->
+<nav id="tabbar" class="tabbar" aria-label="하단 탭"></nav>
+
+<script src="../config.js"></script>
+<script src="../store.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>
