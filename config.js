@@ -48,7 +48,7 @@ const CONFIG = {
     setChannels: 'settings/channels.html',
     tone:        'settings/tone.html',
     store:       'settings/store.html',
-    onboarding:  'onboarding.html'
+    onboarding:  'onboarding/onboarding.html'
   },
 
   /* ---------- 연동 플랫폼 ----------
