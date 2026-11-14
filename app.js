@@ -2154,6 +2154,10 @@ function pageLogin() {
       <div class="brand-mark">${b.mark}</div>
       <div><div class="ob-name">${esc(b.name)}</div><div class="ob-sub">${esc(b.owner)}</div></div>
     </div>
+    <div class="seg" style="margin-bottom:16px">
+      <button type="button" data-auth="login" aria-selected="${!signup}">로그인</button>
+      <button type="button" data-auth="signup" aria-selected="${signup}">회원가입</button>
+    </div>
     <h2 class="ob-t">${signup ? '매장 계정 만들기' : '로그인'}</h2>
     <p class="ob-d">${signup ? '가입하면 매장이 만들어지고, 업종을 고르면 AI 응대 설정이 바로 채워져요.' : '사장님 계정으로 로그인해 주세요.'}</p>
     <form class="card" id="authForm" novalidate>
@@ -2206,6 +2210,9 @@ document.addEventListener('submit', (e) => {
 document.addEventListener('click', (e) => {
   const a = e.target.closest('[data-auth]');
   if (!a) return;
+  if (a.dataset.auth === 'login' || a.dataset.auth === 'signup') {
+    auth.mode = a.dataset.auth; auth.err = ''; render();
+  }
   if (a.dataset.auth === 'mode') { auth.mode = auth.mode === 'login' ? 'signup' : 'login'; auth.err = ''; render(); }
   if (a.dataset.auth === 'logout') {
     Api.logout().then(() => location.replace(L.login));
